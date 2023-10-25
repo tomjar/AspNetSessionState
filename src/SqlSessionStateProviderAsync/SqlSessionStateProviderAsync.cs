@@ -118,10 +118,12 @@ namespace Microsoft.AspNet.SessionState
                             s_sqlSessionStateRepository = new SqlSessionStateRepository(connectionString.ConnectionString, tableName,
                                 (int)ssc.SqlCommandTimeout.TotalSeconds, GetRetryInterval(config), GetMaxRetryNum(config));
                         }
-                        if (shouldCreateTable)
-                        {
-                            s_sqlSessionStateRepository.CreateSessionStateTable();
-                        }
+
+                        // Stop this!!! let us configure whether or not we want to auto create the table and stored procedures.
+                        //if (shouldCreateTable)
+                        //{
+                            // s_sqlSessionStateRepository.CreateSessionStateTable();
+                        //}
 
                         var appId = AppId ?? HttpRuntime.AppDomainAppId;
                         Debug.Assert(appId != null);
