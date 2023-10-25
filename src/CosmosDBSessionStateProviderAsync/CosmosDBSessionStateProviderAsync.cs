@@ -26,7 +26,16 @@ namespace Microsoft.AspNet.SessionState
     /// </summary>
     public class CosmosDBSessionStateProviderAsync : SessionStateStoreProviderAsyncBase
     {
-        private static readonly int DefaultLockCookie = 1;
+    #region ResourceStringFormats
+    private static readonly string ArgumentNull_WithParamName = "Parameter '{0}' cannot be null.";
+    private static readonly string Container_PKey_Does_Not_Match = "The specified container '{0}' already exists with a partition key path other than '{1}'.";
+		private static readonly string EmptyConfig_WithName = "Configuration '{0}' cannot be null.";
+    private static readonly string Invalid_session_state = "The session state information is invalid and might be corrupted.";
+		private static readonly string Request_To_CosmosDB_Is_Too_Large = "The request rate to CosmosDB is too large. You may consider to increase the offer throughput of the CosmosDB collection or increase maxRetryAttemptsOnThrottledRequests and maxRetryWaitTimeInSeconds settings in web.config";
+		#endregion
+
+
+		private static readonly int DefaultLockCookie = 1;
 
         private static string s_endPoint;
         private static string s_authKey;
@@ -786,29 +795,29 @@ namespace Microsoft.AspNet.SessionState
             var endPointSettingKey = providerConfig["cosmosDBEndPointSettingKey"];
             if (string.IsNullOrEmpty(endPointSettingKey))
             {
-                throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, "cosmosDBEndPointSettingKey"));
+                throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, "cosmosDBEndPointSettingKey"));
             }
             s_endPoint = appSettings[endPointSettingKey];
             if (string.IsNullOrEmpty(s_endPoint))
             {
-                throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, endPointSettingKey));
+                throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, endPointSettingKey));
             }
 
             var authKeySettingKey = providerConfig["cosmosDBAuthKeySettingKey"];
             if (string.IsNullOrEmpty(authKeySettingKey))
             {
-                throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, "cosmosDBAuthKeySettingKey"));
+                throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, "cosmosDBAuthKeySettingKey"));
             }
             s_authKey = appSettings[authKeySettingKey];
             if (string.IsNullOrEmpty(s_authKey))
             {
-                throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, authKeySettingKey));
+                throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, authKeySettingKey));
             }
 
             s_dbId = providerConfig["databaseId"];
             if (string.IsNullOrEmpty(s_dbId))
             {
-                throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, "databaseId"));
+                throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, "databaseId"));
             }
 
             s_containerId = providerConfig["containerId"];
@@ -817,7 +826,7 @@ namespace Microsoft.AspNet.SessionState
                 s_containerId = providerConfig["collectionId"];
                 if (string.IsNullOrEmpty(s_containerId))
                 {
-                    throw new ConfigurationErrorsException(string.Format(SR.EmptyConfig_WithName, "containerId"));
+                    throw new ConfigurationErrorsException(string.Format(EmptyConfig_WithName, "containerId"));
                 }
             }
 
@@ -911,7 +920,7 @@ namespace Microsoft.AspNet.SessionState
 
             if (response?.Resource?.PartitionKeyPath != partitionKeyPath)
             {
-                throw new Exception(String.Format(CultureInfo.CurrentCulture, SR.Container_PKey_Does_Not_Match, s_containerId, partitionKeyPath));
+                throw new Exception(String.Format(CultureInfo.CurrentCulture, Container_PKey_Does_Not_Match, s_containerId, partitionKeyPath));
             }
         }
 
@@ -965,7 +974,7 @@ namespace Microsoft.AspNet.SessionState
                 //Status 429: The request rate is too large
                 if ((int)dce.StatusCode == 429)
                 {
-                    throw new Exception(SR.Request_To_CosmosDB_Is_Too_Large);
+                    throw new Exception(Request_To_CosmosDB_Is_Too_Large);
                 }
                 else
                 {
@@ -977,7 +986,7 @@ namespace Microsoft.AspNet.SessionState
                 var innerException = ae.InnerException as CosmosException;
                 if (innerException != null & (int)innerException.StatusCode == 429)
                 {
-                    throw new Exception(SR.Request_To_CosmosDB_Is_Too_Large);
+                    throw new Exception(Request_To_CosmosDB_Is_Too_Large);
                 }
                 else
                 {
@@ -1125,12 +1134,12 @@ namespace Microsoft.AspNet.SessionState
                 eof = reader.ReadByte();
                 if (eof != 0xff)
                 {
-                    throw new HttpException(String.Format(CultureInfo.CurrentCulture, SR.Invalid_session_state));
+                    throw new HttpException(String.Format(CultureInfo.CurrentCulture, Invalid_session_state));
                 }
             }
             catch (EndOfStreamException)
             {
-                throw new HttpException(String.Format(CultureInfo.CurrentCulture, SR.Invalid_session_state));
+                throw new HttpException(String.Format(CultureInfo.CurrentCulture, Invalid_session_state));
             }
 
             return new SessionStateStoreData(sessionItems, staticObjects, timeout);
