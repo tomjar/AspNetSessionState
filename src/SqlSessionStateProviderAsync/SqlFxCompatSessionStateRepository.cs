@@ -406,12 +406,7 @@ namespace Microsoft.AspNet.SessionState
         #endregion
 
         #region ISqlSessionStateRepository implementation
-        public void CreateSessionStateTable()
-        {
-            // This is going to be a lot nicer with 'await'
-            var task = CreateSessionStateTableAsync().ConfigureAwait(false);
-            task.GetAwaiter().GetResult();
-        }
+        public void CreateSessionStateTable() { }
 
         private async Task<bool> CreateSessionStateTableAsync()
         {

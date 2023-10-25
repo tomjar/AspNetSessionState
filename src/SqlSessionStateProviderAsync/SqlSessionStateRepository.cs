@@ -403,51 +403,7 @@ namespace Microsoft.AspNet.SessionState
         #endregion
 
         #region ISqlSessionStateRepository implementation
-        public void CreateSessionStateTable()
-        {
-            // This is going to be a lot nicer with 'await'
-            var task = CreateSessionStateTableAsync().ConfigureAwait(false);
-            task.GetAwaiter().GetResult();
-        }
-
-        private async Task<bool> CreateSessionStateTableAsync()
-        {
-            SqlTransaction transaction;
-
-            using (var connection = new SqlConnection(_connectString))
-            {
-                await connection.OpenAsync();
-                transaction = connection.BeginTransaction();
-
-                try
-                {
-
-                    // Ensure the State table is created
-                    var cmd = new SqlCommand(CreateSessionTableSql, connection, transaction);
-                    await cmd.ExecuteNonQueryAsync();
-
-                    // Ensure necessary SProcs exist as well
-                    await _commandHelper.CreateSProcIfDoesNotExist(GetStateItemExclusiveSP, GetStateItemExclusiveSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(GetStateItemSP, GetStateItemSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(DeleteExpiredSessionsSP, DeleteExpiredSessionsSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(InsertUninitializedItemSP, InsertUninitializedItemSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(ReleaseItemExclusiveSP, ReleaseItemExclusiveSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(RemoveStateItemSP, RemoveStateItemSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(ResetItemTimeoutSP, ResetItemTimeoutSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(UpdateStateItemSP, UpdateStateItemSql, connection, transaction);
-                    await _commandHelper.CreateSProcIfDoesNotExist(InsertStateItemSP, InsertStateItemSql, connection, transaction);
-
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    try { transaction.Rollback(); } catch (Exception) { }
-                    throw new HttpException(SR.Cant_connect_sql_session_database, ex);
-                }
-            }
-
-            return true;
-        }
+        public void CreateSessionStateTable(){ }
 
         public void DeleteExpiredSessions()
         {
