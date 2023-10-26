@@ -1,6 +1,6 @@
 
 ## Small Rant
-Holy Hell, could we please have a option to turn off the auto initalization. Yes please. This fork does this. Why am I having to create a fork to do this one measly thing. 
+Grrrrr, a option to not auto check for the necessary table and stored procedures would be nice.
 
 ## Introduction
 SessionStateModule is ASP.NET’s default session-state handler which retrieves session data and writes it to the session-state store. It already operates asynchronously when acquiring the request state, but it doesn’t support async read/write to the session-state store. In the .NET Framework 4.6.2 release, we introduced a new interface named ISessionStateModule to enable this scenario. You can find more details on [this blog post](https://blogs.msdn.microsoft.com/webdev/2016/09/29/introducing-the-asp-net-async-sessionstate-module/).
